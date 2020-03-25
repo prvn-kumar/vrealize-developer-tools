@@ -68,7 +68,7 @@ export class VraNGRestClient {
     private get refreshToken(): string | undefined {
         return this.conf.vrdev.auth.refreshToken
     }
-   
+
     /**
      * The main API for obtaining token. There are different methods to do it.
      * Which one to use is controlled by auth.profile value in settings.json
@@ -84,21 +84,21 @@ export class VraNGRestClient {
             this.logger.info(`VraNGRestClient:getAccessToken() -- REUSING ACCESS TOKEN -- `);
             return Promise.resolve(VraNGRestClient.ACCESS_TOKEN);
         }
-        
-        this.logger.info(`VraNGRestClient:getAccessToken() using auth profile = ${this.authProfile}`)  
+
+        this.logger.info(`VraNGRestClient:getAccessToken() using auth profile = ${this.authProfile}`)
         switch (this.authProfile.toLowerCase()) {
-            case "refresh-token":    
+            case "refresh-token":
                 // If refresh token does not exists in local storage, ask for usr/passwd
                 if( this.refreshToken === undefined || this.refreshToken === null ) {
-                    return this.getAccessTokenUPD(this.domain, baseUrl + useUpdUrl) 
+                    return this.getAccessTokenUPD(this.domain, baseUrl + useUpdUrl)
                 }
                 else {
                     return this.getNewAccessToken(this.refreshToken, baseUrl + useRefTokUrl)
                 }
-                
+
             case "user-password-domain":
                 return this.getAccessTokenUPD(this.domain, baseUrl + useUpdUrl)
-                
+
             default:
                 this.logger.error(`VraNGRestClient:getAccessToken() auth profile ${this.authProfile} not supported`)
                 return Promise.reject("")
@@ -107,9 +107,9 @@ export class VraNGRestClient {
 
     /**
      * Get access token by given: user, password, domain
-     * @param usr 
-     * @param psswd 
-     * @param domain 
+     * @param usr
+     * @param psswd
+     * @param domain
      * @param uri
      * @return resolved promise with the token or empty string on failure
      */
@@ -135,7 +135,7 @@ export class VraNGRestClient {
         }
         try {
             const options = {
-                simple: true, 
+                simple: true,
                 resolveWithFullResponse: false,
                 rejectUnauthorized: false,
                 headers: {
@@ -144,18 +144,18 @@ export class VraNGRestClient {
                 json: true,
                 method: "POST",
                 uri,
-                body: { 
+                body: {
                         "domain": this.domain,
                         "password": passw,
                         "scope": this.scope,
                         "username": user
                       }
-            }          
+            }
             const aToken: Token = await request(options);
             this.logger.info(`getAccessTokenUPD() refresh_token found ${aToken.refresh_token}`);
             VraNGRestClient.ACCESS_TOKEN = aToken.access_token;
             if( this.refreshToken === undefined || this.refreshToken === null ) {
-                // TODO: For now store refresh token in stettings.json 
+                // TODO: For now store refresh token in stettings.json
                 // Perhaps use node-localstorage or token-file in .o11n/tokens
                 let settingsPath = this.env.workspaceFolders[0].uri.path + "/.vscode/" + this.confFile;
                 const settingsContent = fs.readFileSync(settingsPath)
@@ -174,11 +174,11 @@ export class VraNGRestClient {
 
     /**
      * By given refresh token, fetch new access token from the Auth Server
-     * @param refreshToken 
+     * @param refreshToken
      * @param uri - URI of Auth Server
      * @return resolved promise with the access token on success or an empty string on failure
      */
-    private async getNewAccessToken(refreshToken: string, uri: string) : Promise<string> {    
+    private async getNewAccessToken(refreshToken: string, uri: string) : Promise<string> {
         this.logger.info(`getNewAccessToken() url=${uri}, refTok=${refreshToken}`);
         var accessToken: string = "";
         interface Token {
@@ -187,7 +187,7 @@ export class VraNGRestClient {
         }
         try {
             const options = {
-                simple: true, 
+                simple: true,
                 resolveWithFullResponse: false,
                 rejectUnauthorized: false,
                 headers: {
@@ -210,15 +210,15 @@ export class VraNGRestClient {
     }
 
     // -----------------------------------------------------------
-    // BluePrint related APIs ------------------------------------
+    // Blueprint related APIs ------------------------------------
     // -----------------------------------------------------------
-       
+
 
     /**
      * Fetch Blueprint file from VRA by given blueprint GUID and write its content into filePath
-     * @param uri 
-     * @param filePath 
-     * @param accessToken 
+     * @param uri
+     * @param filePath
+     * @param accessToken
      */
     async getBlueprintById(uri: string, filePath: string, accessToken: string): Promise<void> {
         let au: Auth = new VraNGAuth(accessToken)
@@ -234,17 +234,17 @@ export class VraNGRestClient {
             uri,
             auth: au.toRequestJson()
         }
-        this.logger.info(`getBluePrintById: Sending GET to ${uri}`)
+        this.logger.info(`getBlueprintById: Sending GET to ${uri}`)
         const rt: Blueprint = await request(options).then( res => { return JSON.parse(res)})
-        this.logger.info(`getBluePrintById: content =  ${rt.content}`)
+        this.logger.info(`getBlueprintById: content =  ${rt.content}`)
         return fs.writeFile(filePath, rt.content)
     }
 
     /**
      * Return the blueprint GUID by given Blueprint Name
-     * @param uri 
-     * @param accessToken 
-     * @returns resolved Promise with blueprint id or empty string on failure  
+     * @param uri
+     * @param accessToken
+     * @returns resolved Promise with blueprint id or empty string on failure
      */
     async getBlueprintByName(uri: string,  accessToken: string): Promise<string> {
         let au: Auth = new VraNGAuth(accessToken)
@@ -277,17 +277,17 @@ export class VraNGRestClient {
             uri,
             auth: au.toRequestJson()
         }
-        
-        this.logger.info(`getBluePrintByName: Sending GET to ${uri}`)
+
+        this.logger.info(`getBlueprintByName: Sending GET to ${uri}`)
         var abp = await request(options)
         var ret: AllBps = JSON.parse(abp)
         return new Promise((resolve,reject) => {
             if(ret != null && typeof ret.content != "undefined" && ret.content.length > 0){
-                this.logger.info(`getBluePrintByName: number-Of-Elements=${ret.numberOfElements} Id=${ret.content[0].id}`)
+                this.logger.info(`getBlueprintByName: number-Of-Elements=${ret.numberOfElements} Id=${ret.content[0].id}`)
                 // Normally array is sorted and latest Blueprint will be arr[0]
                 // TODO: if array not sorted (ret.sort.sorted == false), traverse and sort by Date to return latest doc
                 resolve(ret.content[0].id)
-                
+
             }
             else reject("")
         })
@@ -296,17 +296,17 @@ export class VraNGRestClient {
     /**
      * Save blueprint file to VRA.
      * @param inBody - content and projectId passed here
-     * @param accessToken 
+     * @param accessToken
      * @returns promise with the id of the newly created blueprint
      */
-    async saveBlueprint(inBody: any, accessToken?: string): Promise<string> { 
+    async saveBlueprint(inBody: any, accessToken?: string): Promise<string> {
         if(accessToken === undefined){
             accessToken = await this.getAccessToken();
-        }    
-        let au: Auth = new VraNGAuth(accessToken) 
+        }
+        let au: Auth = new VraNGAuth(accessToken)
         const uri = `https://${this.host}/blueprint/api/blueprints`
         const options = {
-            simple: true, 
+            simple: true,
             resolveWithFullResponse: false,
             rejectUnauthorized: false,
             headers: {
@@ -319,13 +319,13 @@ export class VraNGRestClient {
             auth: au.toRequestJson()
         }
         const execResponse = await request(options)
-        this.logger.info(`saveBluePrint: ${execResponse}`)
-        
+        this.logger.info(`saveBlueprint: ${execResponse}`)
+
         if(execResponse === null || execResponse === undefined){
             return Promise.reject("Failed to save Blueprint File on vRA");
         }
         else {
-            this.logger.info(`saveBluePrint: newly crerated Id= ${execResponse.id}`)
+            this.logger.info(`saveBlueprint: newly crerated Id= ${execResponse.id}`)
             return Promise.resolve(execResponse.id);
         }
     }
@@ -333,17 +333,17 @@ export class VraNGRestClient {
     /**
      * Deploy given blueprint. It is not necessary to exist on VRA beforehand.
      * @param inBody - contains deployment name, content, project Id, etc.
-     * @param accessToken 
+     * @param accessToken
      */
     async deployBlueprint(inBody: any, accessToken?: string) : Promise<void> {
         this.logger.info("deployBlueprint --- started ---");
         if(accessToken === undefined){
             accessToken = await this.getAccessToken();
         }
-        let au: Auth = new VraNGAuth(accessToken) 
+        let au: Auth = new VraNGAuth(accessToken)
         const uri = `https://${this.host}/blueprint/api/blueprint-requests`
         const options = {
-            simple: true, 
+            simple: true,
             resolveWithFullResponse: false,
             rejectUnauthorized: false,
             headers: {
@@ -359,15 +359,15 @@ export class VraNGRestClient {
         if(execResponse == null || execResponse === undefined || execResponse.status !== "STARTED"){
             return Promise.reject()
         }
-        this.logger.info(`deployBluePrint: deployed=${execResponse.deploymentName}, status=${execResponse.status}`)
+        this.logger.info(`deployBlueprint: deployed=${execResponse.deploymentName}, status=${execResponse.status}`)
         return Promise.resolve()
     }
 
 
     /**
      * Get VRA project Id by given project Name
-     * @param projectName 
-     * @param accessToken 
+     * @param projectName
+     * @param accessToken
      * @returns Promise  with project GUID or error message on failure
      */
     async getProjectId( projectName: string, accessToken?: string) : Promise<string>{
@@ -375,8 +375,8 @@ export class VraNGRestClient {
         if(accessToken === undefined){
             accessToken = await this.getAccessToken();
         }
-       
-        let au: Auth = new VraNGAuth(accessToken) 
+
+        let au: Auth = new VraNGAuth(accessToken)
         const baseUrl: string = "https://" + this.host + ":" + this.port
         const projFilterUrl = "/iaas/api/projects?%24filter=name+eq+%27";
         const uri = baseUrl + projFilterUrl + encodeURIComponent(projectName) + "%27";
@@ -393,14 +393,14 @@ export class VraNGRestClient {
             uri,
             auth: au.toRequestJson()
         }
-        
+
         try{
             this.logger.info(`getProjectId: Sending GET to ${uri}`)
             var resp = await request(options)
             this.logger.info(`getProjectId: elements=${resp.totalElements}, projId=${resp.content[0].id}`)
         }
         catch(err){
-            this.logger.error(`getProjectId: excp=${err.toString()}`)  
+            this.logger.error(`getProjectId: excp=${err.toString()}`)
             return Promise.reject("Getting vRAProject Id failed")
         }
 

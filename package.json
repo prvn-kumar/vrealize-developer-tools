@@ -39,7 +39,10 @@
     "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
     "onCommand:vrdev.toggle.typescript",
-    "onCommand:vrdev.blueprint.create"
+    "onCommand:vrdev.blueprint.create",
+    "onCommand:vrdev.blueprint.fetch",
+    "onCommand:vrdev.blueprint.upload",
+    "onCommand:vrdev.blueprint.deploy"
   ],
   "main": "./extension/out/extension",
   "icon": "assets/logo.png",
@@ -200,8 +203,8 @@
         }
       },
       {
-        "command": "vrdev.blueprint.save",
-        "title": "Save Blueprint",
+        "command": "vrdev.blueprint.upload",
+        "title": "Upload Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
@@ -209,8 +212,8 @@
         }
       },
       {
-        "command": "vrdev.blueprint.get",
-        "title": "Get Blueprint",
+        "command": "vrdev.blueprint.fetch",
+        "title": "Fetch Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
