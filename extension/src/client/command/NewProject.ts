@@ -59,7 +59,7 @@ const projectTypes: ProjectType[] = [
 ]
 
 @AutoWire
-export class NewProject extends Command {
+export class NewProject extends Command<void> {
     private readonly logger = Logger.get("NewProject")
     private readonly state = {} as State
     private readonly title = "Create New Project"

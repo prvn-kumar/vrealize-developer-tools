@@ -15,7 +15,7 @@ import { ConfigurationManager, EnvironmentManager } from "../system"
 
 
 @AutoWire
-export class UploadBlueprint extends Command {
+export class UploadBlueprint extends Command<void> {
     private readonly logger = Logger.get("UploadBlueprint")
     private restClient: VraNgRestClient
 
@@ -29,7 +29,7 @@ export class UploadBlueprint extends Command {
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
-        this.logger.info(`Executing command UploadBlueprint`);
+        this.logger.info(`Executing command UploadBlueprint`)
 
         const activeTextEditor = vscode.window.activeTextEditor
         if (!activeTextEditor) {
@@ -44,41 +44,39 @@ export class UploadBlueprint extends Command {
 
         const activeFilePath = activeTextEditor.document.uri.fsPath
         const blueprintName: vscode.InputBoxOptions = {
-			prompt: "Enter name of Blueprint you want to save to vRA: ",
-			placeHolder: "(BLUEPRINT NAME)"
+            prompt: "Enter name of Blueprint you want to save to vRA: ",
+            placeHolder: "(BLUEPRINT NAME)"
         }
         const bpName = await vscode.window.showInputBox(blueprintName)
 
         const projectName: vscode.InputBoxOptions = {
-			prompt: "Enter the name of the VRA Project: ",
-			placeHolder: "(PROJECT NAME)",
+            prompt: "Enter the name of the VRA Project: ",
+            placeHolder: "(PROJECT NAME)"
         }
-        const projName: string = await vscode.window.showInputBox(projectName) || ""
+        const projName: string = (await vscode.window.showInputBox(projectName)) || ""
         const projId = await this.restClient.getProjectId(projName)
         this.logger.info(`UploadBlueprint:execute() Project=${projName} with projId=${projId}`)
-        const filePath = path.join(this.env.workspaceFolders[0].uri.path, `${bpName }.yaml`)
-        this.logger.info(`UploadBlueprint:execute() filePath = ${filePath}`);
+        const filePath = path.join(this.env.workspaceFolders[0].uri.path, `${bpName}.yaml`)
+        this.logger.info(`UploadBlueprint:execute() filePath = ${filePath}`)
         try {
-            if(projId === undefined || bpName === undefined) {
+            if (projId === undefined || bpName === undefined) {
                 throw new Error("Missing Input Data")
             }
-            fs.exists(filePath, (exist:any) => {
+            fs.exists(filePath, (exist: any) => {
                 if (exist) {
-                    const content = fs.readFileSync(filePath).toString();
+                    const content = fs.readFileSync(filePath).toString()
                     this.logger.info(`UploadBlueprint:execute() content = ${content}`)
                     const body = {
-                        "name": bpName,
-                        "projectId": projId,
-                        "content": content
+                        name: bpName,
+                        projectId: projId,
+                        content: content
                     }
                     this.restClient.saveBlueprint(body)
-                }
-                else {
+                } else {
                     vscode.window.showWarningMessage("Blueprint not found.")
                 }
             })
-        }
-        catch(err){
+        } catch (err) {
             this.logger.error(`UploadBlueprint:execute() excp=${err.toString()}`)
             return Promise.reject()
         }

@@ -31,7 +31,7 @@ export interface AuthGrant {
 
 export interface VraIdentityMediator {
     write(host: string, token: Token): Promise<void>
-    read(host: string): Promise<AuthGrant>
+    read(host: string): Promise<AuthGrant | undefined>
 }
 
 export class VraNgRestClient {
@@ -67,6 +67,10 @@ export class VraNgRestClient {
     private async getAuth(): Promise<object> {
         const baseUrl = this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : `https://${this.host}:${this.port}`
         const grant = await this.identityMediator.read(this.host)
+
+        if (!grant) {
+            return Promise.reject("Missing vRA authentication configuration")
+        }
 
         if (grant.accessToken) {
             return new VraNgAuth(grant.accessToken).toRequestJson()

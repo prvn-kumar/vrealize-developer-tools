@@ -38,6 +38,7 @@ export enum Commands {
     EventCollectionSuccess = "vrdev.event.onCollectionSuccess",
     EventCollectionError = "vrdev.event.onCollectionError",
 
+    ConfigureVraAuth = "vrdev.vra.auth.configure",
     CreateBlueprint = "vrdev.blueprint.create",
     UploadBlueprint = "vrdev.blueprint.upload",
     FetchBlueprint = "vrdev.blueprint.fetch",

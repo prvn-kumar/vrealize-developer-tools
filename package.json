@@ -39,6 +39,7 @@
     "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
     "onCommand:vrdev.toggle.typescript",
+    "onCommand:vrdev.vra.auth.configure",
     "onCommand:vrdev.blueprint.create",
     "onCommand:vrdev.blueprint.fetch",
     "onCommand:vrdev.blueprint.upload",
@@ -191,6 +192,11 @@
       {
         "command": "vrdev.toggle.typescript",
         "title": "Toggle TypeScript Support (Experimental)",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.vra.auth.configure",
+        "title": "Configure vRA Authentication",
         "category": "vRealize"
       },
       {
