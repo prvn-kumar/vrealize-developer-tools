@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, VraNGRestClient } from "vrealize-common"
+import { AutoWire, Logger, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
@@ -15,7 +15,7 @@ import { ConfigurationManager, EnvironmentManager } from "../system"
 @AutoWire
 export class GetBlueprint extends Command {
     private readonly logger = Logger.get("FetchBlueprint")
-    private restClient: VraNGRestClient
+    private restClient: VraNgRestClient
     private conf: ConfigurationManager
     private envMgr: EnvironmentManager
 
@@ -25,7 +25,7 @@ export class GetBlueprint extends Command {
 
     constructor(environment: EnvironmentManager, config: ConfigurationManager) {
         super()
-        this.restClient = new VraNGRestClient(config, environment)
+        this.restClient = new VraNgRestClient(config, environment)
         this.conf = config
         this.envMgr = environment
     }

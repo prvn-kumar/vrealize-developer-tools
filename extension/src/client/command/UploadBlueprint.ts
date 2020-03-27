@@ -6,7 +6,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 
-import { AutoWire, Logger, VraNGRestClient } from "vrealize-common"
+import { AutoWire, Logger, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands} from "../constants"
@@ -17,24 +17,32 @@ import { ConfigurationManager, EnvironmentManager } from "../system"
 @AutoWire
 export class UploadBlueprint extends Command {
     private readonly logger = Logger.get("UploadBlueprint")
-    private restClient: VraNGRestClient
-    private conf: ConfigurationManager
-    private env: EnvironmentManager
+    private restClient: VraNgRestClient
 
     get commandId(): string {
         return Commands.UploadBlueprint
     }
 
-    constructor(environment: EnvironmentManager, config: ConfigurationManager) {
+    constructor(private env: EnvironmentManager, config: ConfigurationManager) {
         super()
-        this.restClient = new VraNGRestClient(config, environment)
-        this.conf = config
-        this.env = environment
+        this.restClient = new VraNgRestClient(config, env)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
-        this.logger.info(`Executing command UploadBlueprint${ this.conf.vrdev.auth.profile}`);
+        this.logger.info(`Executing command UploadBlueprint`);
 
+        const activeTextEditor = vscode.window.activeTextEditor
+        if (!activeTextEditor) {
+            vscode.window.showErrorMessage("There is no opened file in the editor")
+            return
+        }
+
+        if (activeTextEditor.document.languageId !== "yaml") {
+            vscode.window.showErrorMessage("The currently opened file is not a YAML file")
+            return
+        }
+
+        const activeFilePath = activeTextEditor.document.uri.fsPath
         const blueprintName: vscode.InputBoxOptions = {
 			prompt: "Enter name of Blueprint you want to save to vRA: ",
 			placeHolder: "(BLUEPRINT NAME)"

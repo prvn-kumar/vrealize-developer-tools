@@ -340,6 +340,16 @@
           "when": "resourceLangId == javascript || resourceLangId == typescript",
           "command": "vrdev.run.action",
           "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.upload",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.deploy",
+          "group": "navigation"
         }
       ],
       "commandPalette": [
@@ -447,10 +457,26 @@
           "description": "A maven profile (i.e. -Pprofile) to be used for maven executions, e.g. pull, push, Maven collection.",
           "scope": "window"
         },
-        "vrdev.auth.profile": {
+        "vrdev.vra.auth.type": {
           "type": "string",
-          "default": "",
-          "description": "Authentication method. Authenticate via refresh token or user-password.",
+          "enum": [
+            "refresh_token",
+            "password"
+          ],
+          "description": "Method for authetication towards vRealize Automation 8",
+          "default": "refresh_token",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.host": {
+          "type": "string",
+          "default": "www.mgmt.cloud.vmware.com",
+          "description": "",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.port": {
+          "type": "integer",
+          "default": "443",
+          "description": "",
           "scope": "window"
         },
         "vrdev.experimental.typescript": {

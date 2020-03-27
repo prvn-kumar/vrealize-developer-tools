@@ -6,7 +6,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 
-import { AutoWire, Logger, VraNGRestClient } from "vrealize-common"
+import { AutoWire, Logger, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands} from "../constants"
@@ -18,7 +18,7 @@ import { ConfigurationManager, EnvironmentManager } from "../system"
 @AutoWire
 export class DeployBlueprint extends AbstractBlueprintCommand {
     private readonly logger = Logger.get("DeployBlueprint")
-    private restClient: VraNGRestClient
+    private restClient: VraNgRestClient
 
     get commandId(): string {
         return Commands.DeployBlueprint
@@ -26,7 +26,7 @@ export class DeployBlueprint extends AbstractBlueprintCommand {
 
     constructor(env: EnvironmentManager, config: ConfigurationManager) {
         super(env)
-        this.restClient = new VraNGRestClient(config, env)
+        this.restClient = new VraNgRestClient(config, env)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
