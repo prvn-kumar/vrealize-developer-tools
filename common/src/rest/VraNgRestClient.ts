@@ -38,9 +38,9 @@ export class AuthGrant implements TokenPair {
         return new AuthGrant("password", undefined, undefined, undefined, username, password, orgId)
     }
 
-    ClientCredentials(clientId: string, clientSecret: string) {
-        return new AuthGrant("password", undefined, clientId, clientSecret)
-    }
+    // static ClientCredentials(clientId: string, clientSecret: string) {
+    //    return new AuthGrant("client_credentials", undefined, clientId, clientSecret)
+    // }
 }
 
 export interface VraIdentityIO {
